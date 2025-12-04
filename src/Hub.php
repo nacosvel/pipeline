@@ -72,8 +72,8 @@ class Hub implements Contracts\Hub
      */
     public function pipelines(string $name, array $pipes = []): void
     {
-        $this->pipelines[$name] = function (Pipeline $pipeline, $passable) use ($pipes) {
-            return $pipeline->send($passable)->through($pipes)->thenReturn();
+        $this->pipelines[$name] = function (Pipeline $pipeline, $passable) use ($name, $pipes) {
+            return $pipeline->send($passable)->through($this->pipe($pipes, "{$name}.pipe"))->thenReturn();
         };
     }
 
@@ -90,7 +90,7 @@ class Hub implements Contracts\Hub
         $pipeline = $pipeline ?: 'default';
 
         if (array_key_exists($pipeline, $this->pipelines) === false) {
-            $this->pipelines($pipeline);
+            return $passable;
         }
 
         return call_user_func(
