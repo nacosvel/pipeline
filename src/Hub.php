@@ -4,16 +4,10 @@ namespace Nacosvel\Pipeline;
 
 use Closure;
 use Psr\Container\ContainerInterface;
+use RuntimeException;
 
 class Hub implements Contracts\Hub
 {
-    /**
-     * The container implementation.
-     *
-     * @var ContainerInterface|null
-     */
-    protected ?ContainerInterface $container;
-
     /**
      * All the available pipelines.
      *
@@ -26,9 +20,9 @@ class Hub implements Contracts\Hub
      *
      * @param ContainerInterface|null $container
      */
-    public function __construct(?ContainerInterface $container = null)
+    public function __construct(protected ?ContainerInterface $container = null)
     {
-        $this->container = $container;
+        //
     }
 
     /**
@@ -80,15 +74,13 @@ class Hub implements Contracts\Hub
     /**
      * Send an object through one of the available pipelines.
      *
-     * @param mixed       $passable
-     * @param string|null $pipeline
+     * @param mixed  $passable
+     * @param string $pipeline
      *
      * @return mixed
      */
-    public function pipe($passable, string $pipeline = null)
+    public function pipe($passable, string $pipeline = 'default')
     {
-        $pipeline = $pipeline ?: 'default';
-
         if (array_key_exists($pipeline, $this->pipelines) === false) {
             return $passable;
         }
@@ -101,10 +93,16 @@ class Hub implements Contracts\Hub
     /**
      * Get the container instance used by the hub.
      *
-     * @return ContainerInterface|null
+     * @return ContainerInterface
+     *
+     * @throws RuntimeException
      */
-    public function getContainer(): ?ContainerInterface
+    public function getContainer(): ContainerInterface
     {
+        if (!$this->container) {
+            throw new RuntimeException('A container instance has not been passed to the Pipeline.');
+        }
+
         return $this->container;
     }
 
@@ -113,7 +111,7 @@ class Hub implements Contracts\Hub
      *
      * @param ContainerInterface $container
      *
-     * @return $this
+     * @return static
      */
     public function setContainer(ContainerInterface $container): static
     {

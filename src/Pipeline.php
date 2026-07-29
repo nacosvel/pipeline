@@ -13,13 +13,6 @@ class Pipeline implements Contracts\Pipeline
     use Macroable;
 
     /**
-     * The container implementation.
-     *
-     * @var ContainerInterface|null
-     */
-    protected ?ContainerInterface $container;
-
-    /**
      * The object being passed through the pipeline.
      *
      * @var mixed
@@ -52,9 +45,9 @@ class Pipeline implements Contracts\Pipeline
      *
      * @param ContainerInterface|null $container
      */
-    public function __construct(?ContainerInterface $container = null)
+    public function __construct(protected ?ContainerInterface $container = null)
     {
-        $this->container = $container;
+        //
     }
 
     /**
@@ -62,7 +55,7 @@ class Pipeline implements Contracts\Pipeline
      *
      * @param mixed $passable
      *
-     * @return $this
+     * @return static
      */
     public function send($passable): static
     {
@@ -76,7 +69,7 @@ class Pipeline implements Contracts\Pipeline
      *
      * @param mixed $pipes
      *
-     * @return $this
+     * @return static
      */
     public function through($pipes): static
     {
@@ -90,7 +83,7 @@ class Pipeline implements Contracts\Pipeline
      *
      * @param mixed $pipes
      *
-     * @return $this
+     * @return static
      */
     public function pipe($pipes): static
     {
@@ -104,7 +97,7 @@ class Pipeline implements Contracts\Pipeline
      *
      * @param string $method
      *
-     * @return $this
+     * @return static
      */
     public function via($method): static
     {
@@ -152,7 +145,7 @@ class Pipeline implements Contracts\Pipeline
      *
      * @param Closure $callback
      *
-     * @return $this
+     * @return static
      */
     public function finally(Closure $callback): static
     {
@@ -259,7 +252,7 @@ class Pipeline implements Contracts\Pipeline
      *
      * @throws RuntimeException
      */
-    protected function getContainer(): ContainerInterface
+    public function getContainer(): ContainerInterface
     {
         if (!$this->container) {
             throw new RuntimeException('A container instance has not been passed to the Pipeline.');
@@ -273,7 +266,7 @@ class Pipeline implements Contracts\Pipeline
      *
      * @param ContainerInterface $container
      *
-     * @return $this
+     * @return static
      */
     public function setContainer(ContainerInterface $container): static
     {
